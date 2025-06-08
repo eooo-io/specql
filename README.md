@@ -43,18 +43,28 @@ specql is a powerful CLI tool that bridges the gap between API design and databa
 In modern web development, we often start with API design using OpenAPI (formerly Swagger) specifications. However, translating these specifications into database schemas and ORM models is typically a manual, time-consuming process that can lead to inconsistencies between your API contract and data layer.
 
 specql automates this process by:
-- 🔄 Converting OpenAPI schemas directly into database structures
-- 🛠️ Generating language-specific ORM models and migrations
-- ✨ Creating boilerplate CRUD operations
-- 🔍 Maintaining consistency between API and database
-- 🚀 Accelerating development workflow
+- Converting OpenAPI schemas directly into database structures
+- Generating language-specific ORM models and migrations
+- Creating boilerplate CRUD operations
+- Maintaining consistency between API and database
+- Accelerating development workflow
 
-### Perfect For:
-- 🏗️ **API-First Development**: Start with your API design and automatically generate the supporting database structure
-- 🔄 **Rapid Prototyping**: Quickly turn API specifications into working backends
-- 🎯 **Microservices**: Generate consistent data layers across multiple services
-- 🔁 **Database Migrations**: Automatically create migrations when your API specs change
-- 📚 **Documentation**: Keep your API, database, and code documentation in sync
+### Perfect For
+
+**API-First Development**  
+Start with your API design and automatically generate the supporting database structure.
+
+**Rapid Prototyping**  
+Quickly turn API specifications into working backends.
+
+**Microservices**  
+Generate consistent data layers across multiple services.
+
+**Database Migrations**  
+Automatically create migrations when your API specs change.
+
+**Documentation**  
+Keep your API, database, and code documentation in sync.
 
 A CLI tool that generates database setups from OpenAPI specifications.
 
