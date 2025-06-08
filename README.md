@@ -2,29 +2,35 @@
 
 <div align="center">
 
+### Created With
 [![TypeScript](https://img.shields.io/badge/TypeScript-4.9.5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-16+-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
 [![OpenAPI](https://img.shields.io/badge/OpenAPI-3.0+-38B832?style=flat-square&logo=openapiinitiative&logoColor=white)](https://www.openapis.org/)
-[![npm](https://img.shields.io/badge/npm-latest-CB3837?style=flat-square&logo=npm&logoColor=white)](https://www.npmjs.com/package/specql)
 
+### Framework Support
 [![FastAPI](https://img.shields.io/badge/FastAPI-Support-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![Laravel](https://img.shields.io/badge/Laravel-Support-FF2D20?style=flat-square&logo=laravel&logoColor=white)](https://laravel.com/)
 [![TypeORM](https://img.shields.io/badge/TypeORM-Support-E83524?style=flat-square&logo=typeorm&logoColor=white)](https://typeorm.io/)
 
+### Database Support
 [![SQLite](https://img.shields.io/badge/SQLite-Support-003B57?style=flat-square&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![MySQL](https://img.shields.io/badge/MySQL-Support-4479A1?style=flat-square&logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![MariaDB](https://img.shields.io/badge/MariaDB-Support-003545?style=flat-square&logo=mariadb&logoColor=white)](https://mariadb.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Support-4169E1?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 
+### Project Status
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/eooo-io/specql/main.yml?style=flat-square)](https://github.com/eooo-io/specql/actions)
 [![Coverage](https://img.shields.io/codecov/c/github/eooo-io/specql?style=flat-square)](https://codecov.io/gh/eooo-io/specql)
 [![npm version](https://img.shields.io/npm/v/specql?style=flat-square)](https://www.npmjs.com/package/specql)
 [![npm downloads](https://img.shields.io/npm/dm/specql?style=flat-square)](https://www.npmjs.com/package/specql)
 
+### Project Standards
 [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg?style=flat-square)](https://conventionalcommits.org)
 [![Code Style](https://img.shields.io/badge/code%20style-prettier-F7B93E.svg?style=flat-square)](https://prettier.io)
+
+---
 
 </div>
 
