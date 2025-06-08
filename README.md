@@ -1,5 +1,8 @@
 # specql
 
+> **⚠️ Work In Progress ⚠️**  
+> This project is under active development. While we're excited about its potential, many features are still in development. Star the repository to stay updated on our progress!
+
 <div align="center">
 
 ### Created With
@@ -99,6 +102,41 @@ Keep your API, database, and code documentation in sync.
   - Sample CRUD queries
   - Relationship mappings
   - Index recommendations
+
+## Coming Soon: Internal API Generation
+
+Transform your database into a fully-featured internal API service with our upcoming API generation feature:
+
+- **Framework Support**
+  - FastAPI (Python) with Pydantic and SQLAlchemy
+  - NestJS (TypeScript) with TypeORM
+  - Laravel (PHP) with Eloquent
+  - Express (TypeScript) with type-safe implementations
+
+- **Generated Components**
+  - DTOs for request/response handling
+  - Service layer with dependency injection
+  - Repository pattern implementation
+  - OpenAPI documentation
+  - Validation schemas
+  - Test suites
+
+- **Advanced Features**
+  - GraphQL endpoint generation
+  - WebSocket support
+  - Event sourcing
+  - CQRS pattern
+  - Caching layer
+  - Message queue integration
+
+- **DevOps Ready**
+  - Docker configuration
+  - CI/CD pipelines
+  - Kubernetes manifests
+  - Monitoring setup
+  - Logging configuration
+
+Stay tuned for these exciting features! Follow our [Roadmap](ROADMAP.md) for more details.
 
 ## Installation
 
