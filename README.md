@@ -1,4 +1,4 @@
-# spec-to-db
+# specql
 
 A CLI tool that generates database setups from OpenAPI specifications.
 
@@ -24,7 +24,7 @@ A CLI tool that generates database setups from OpenAPI specifications.
 ## Installation
 
 ```bash
-npm install -g spec-to-db
+npm install -g specql
 ```
 
 ## Usage
@@ -32,7 +32,7 @@ npm install -g spec-to-db
 Basic usage:
 
 ```bash
-spec-to-db --spec path/to/openapi.yaml
+specql --spec path/to/openapi.yaml
 ```
 
 The CLI will prompt you for:
@@ -71,8 +71,8 @@ dryRun: false
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/spec-to-db.git
-cd spec-to-db
+git clone https://github.com/yourusername/specql.git
+cd specql
 ```
 
 2. Install dependencies:

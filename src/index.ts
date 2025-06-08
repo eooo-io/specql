@@ -12,7 +12,7 @@ import { Config, DatabaseType, Language } from './types';
 const program = new Command();
 
 program
-  .name('spec-to-db')
+  .name('specql')
   .description('Generate database setups from OpenAPI specifications')
   .version('0.1.0')
   .option('-s, --spec <path>', 'Path to OpenAPI specification file')

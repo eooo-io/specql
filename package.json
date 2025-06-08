@@ -1,10 +1,10 @@
 {
-  "name": "spec-to-db",
+  "name": "specql",
   "version": "0.1.0",
   "description": "CLI tool to generate database setups from OpenAPI specifications",
   "main": "dist/index.js",
   "bin": {
-    "spec-to-db": "./dist/index.js"
+    "specql": "./dist/index.js"
   },
   "scripts": {
     "build": "tsc",
@@ -17,7 +17,9 @@
     "openapi",
     "database",
     "cli",
-    "generator"
+    "generator",
+    "sql",
+    "spec"
   ],
   "author": "",
   "license": "MIT",
