@@ -1,184 +1,209 @@
-import { Column, DatabaseSchema, DatabaseType, Relationship, Schema, Table } from '../types';
+import { DatabaseConfig, DatabaseType, Schema, SchemaProperty } from '../types';
 
 export async function generateDatabaseSchema(
   schemas: Schema[],
-  databaseType: DatabaseType
-): Promise<DatabaseSchema> {
-  const tables: Table[] = [];
-  const relationships: Relationship[] = [];
-
-  for (const schema of schemas) {
-    const table = generateTable(schema, databaseType);
-    tables.push(table);
-
-    // Process relationships
-    for (const property of schema.properties) {
-      if (property.ref) {
-        relationships.push({
-          fromTable: schema.name,
-          toTable: property.ref,
-          type: property.type === 'array' ? 'ONE_TO_MANY' : 'ONE_TO_ONE'
-        });
-      }
-    }
-  }
-
-  return { tables, relationships };
-}
-
-function generateTable(schema: Schema, databaseType: DatabaseType): Table {
-  const columns: Column[] = [];
+  config: DatabaseConfig
+): Promise<string> {
+  const statements: string[] = [];
   
-  // Add primary key
-  columns.push({
-    name: 'id',
-    type: getPrimaryKeyType(databaseType),
-    nullable: false,
-    primaryKey: true
-  });
-
-  // Add timestamps
-  columns.push({
-    name: 'created_at',
-    type: getTimestampType(databaseType),
-    nullable: false,
-    default: 'CURRENT_TIMESTAMP'
-  });
-
-  columns.push({
-    name: 'updated_at',
-    type: getTimestampType(databaseType),
-    nullable: false,
-    default: 'CURRENT_TIMESTAMP'
-  });
-
-  // Process properties
-  for (const property of schema.properties) {
-    const column = generateColumn(property, databaseType);
-    if (column) {
-      columns.push(column);
+  for (const schema of schemas) {
+    statements.push(generateTableSchema(schema, config));
+    
+    // Generate foreign key constraints
+    if (schema.relations?.length) {
+      statements.push(...generateRelations(schema, config.databaseType));
     }
   }
 
-  return {
-    name: schema.name.toLowerCase(),
-    columns,
-    indices: generateIndices(schema)
+  return statements.join('\n\n');
+}
+
+function generateTableSchema(schema: Schema, config: DatabaseConfig): string {
+  const columns = schema.properties.map(prop => generateColumn(prop, config.databaseType));
+  
+  const tableName = generateTableName(schema.name, config.namingStrategy);
+  
+  return `CREATE TABLE ${tableName} (\n` +
+    `  id ${getPrimaryKeyType(config.databaseType)} PRIMARY KEY${getAutoIncrement(config.databaseType)},\n` +
+    `  ${columns.join(',\n  ')},\n` +
+    `  created_at TIMESTAMP${getTimestampDefault(config.databaseType)},\n` +
+    `  updated_at TIMESTAMP${getTimestampDefault(config.databaseType)}\n` +
+    ');';
+}
+
+function generateColumn(prop: SchemaProperty, dbType: DatabaseType): string {
+  const type = mapToDbType(prop.type, dbType);
+  const nullability = prop.required ? 'NOT NULL' : 'NULL';
+  const defaultValue = prop.defaultValue !== undefined ? 
+    `DEFAULT ${formatDefaultValue(prop.defaultValue, type)}` : '';
+  
+  const constraints = generateConstraints(prop, dbType);
+  
+  return [
+    prop.name,
+    type,
+    nullability,
+    defaultValue,
+    constraints
+  ].filter(Boolean).join(' ');
+}
+
+function generateRelations(schema: Schema, dbType: DatabaseType): string[] {
+  const tableName = schema.name.toLowerCase();
+  
+  return schema.relations?.map(relation => {
+    const targetTable = relation.targetSchema.toLowerCase();
+    
+    if (relation.type === 'manyToMany') {
+      const joinTable = relation.joinTable || `${tableName}_${targetTable}`;
+      return `CREATE TABLE ${joinTable} (\n` +
+        `  ${tableName}_id ${getPrimaryKeyType(dbType)} REFERENCES ${tableName}(id),\n` +
+        `  ${targetTable}_id ${getPrimaryKeyType(dbType)} REFERENCES ${targetTable}(id),\n` +
+        `  PRIMARY KEY (${tableName}_id, ${targetTable}_id)\n` +
+        ');';
+    }
+    
+    return `ALTER TABLE ${tableName}\n` +
+      `  ADD CONSTRAINT fk_${tableName}_${targetTable}\n` +
+      `  FOREIGN KEY (${relation.foreignKey})\n` +
+      `  REFERENCES ${targetTable}(id);`;
+  }) || [];
+}
+
+function mapToDbType(type: string, dbType: DatabaseType): string {
+  const typeMap: Record<DatabaseType, Record<string, string>> = {
+    [DatabaseType.PostgreSQL]: {
+      'integer': 'INTEGER',
+      'bigint': 'BIGINT',
+      'decimal': 'DECIMAL',
+      'float': 'REAL',
+      'string': 'VARCHAR(255)',
+      'text': 'TEXT',
+      'boolean': 'BOOLEAN',
+      'date': 'DATE',
+      'timestamp': 'TIMESTAMP',
+      'json': 'JSONB',
+      'blob': 'BYTEA'
+    },
+    [DatabaseType.MySQL]: {
+      'integer': 'INT',
+      'bigint': 'BIGINT',
+      'decimal': 'DECIMAL',
+      'float': 'FLOAT',
+      'string': 'VARCHAR(255)',
+      'text': 'TEXT',
+      'boolean': 'TINYINT(1)',
+      'date': 'DATE',
+      'timestamp': 'TIMESTAMP',
+      'json': 'JSON',
+      'blob': 'BLOB'
+    },
+    [DatabaseType.SQLite]: {
+      'integer': 'INTEGER',
+      'bigint': 'INTEGER',
+      'decimal': 'REAL',
+      'float': 'REAL',
+      'string': 'TEXT',
+      'text': 'TEXT',
+      'boolean': 'INTEGER',
+      'date': 'TEXT',
+      'timestamp': 'TEXT',
+      'json': 'TEXT',
+      'blob': 'BLOB'
+    },
+    [DatabaseType.MSSQL]: {
+      'integer': 'INT',
+      'bigint': 'BIGINT',
+      'decimal': 'DECIMAL',
+      'float': 'FLOAT',
+      'string': 'NVARCHAR(255)',
+      'text': 'NTEXT',
+      'boolean': 'BIT',
+      'date': 'DATE',
+      'timestamp': 'DATETIME2',
+      'json': 'NVARCHAR(MAX)',
+      'blob': 'VARBINARY(MAX)'
+    }
   };
+
+  return typeMap[dbType][type] || typeMap[dbType]['string'];
 }
 
-function generateColumn(property: any, databaseType: DatabaseType): Column | null {
-  if (property.ref) {
-    // Handle foreign key
-    return {
-      name: `${property.name}_id`,
-      type: getPrimaryKeyType(databaseType),
-      nullable: property.nullable ?? true,
-      foreignKey: {
-        table: property.ref.toLowerCase(),
-        column: 'id'
-      }
-    };
-  }
-
-  if (property.type === 'array' || property.type === 'object') {
-    // Handle complex types based on database support
-    if (databaseType === DatabaseType.PostgreSQL) {
-      return {
-        name: property.name,
-        type: 'JSONB',
-        nullable: property.nullable ?? true
-      };
-    }
-    return null; // Skip complex types for other databases
-  }
-
-  return {
-    name: property.name,
-    type: mapType(property.type, property.format, databaseType),
-    nullable: property.nullable ?? true,
-    default: property.default
-  };
-}
-
-function generateIndices(schema: Schema): any[] {
-  const indices = [];
-
-  // Add unique constraints
-  for (const property of schema.properties) {
-    if (property.unique) {
-      indices.push({
-        name: `${schema.name}_${property.name}_unique`,
-        columns: [property.name],
-        unique: true
-      });
-    }
-  }
-
-  return indices;
-}
-
-function getPrimaryKeyType(databaseType: DatabaseType): string {
-  switch (databaseType) {
+function getPrimaryKeyType(dbType: DatabaseType): string {
+  switch (dbType) {
     case DatabaseType.PostgreSQL:
-      return 'SERIAL PRIMARY KEY';
-    case DatabaseType.MySQL:
-    case DatabaseType.MariaDB:
-      return 'BIGINT AUTO_INCREMENT';
     case DatabaseType.SQLite:
-      return 'INTEGER PRIMARY KEY AUTOINCREMENT';
-    default:
-      return 'INTEGER PRIMARY KEY';
+      return 'INTEGER';
+    case DatabaseType.MySQL:
+    case DatabaseType.MSSQL:
+      return 'INT';
   }
 }
 
-function getTimestampType(databaseType: DatabaseType): string {
-  switch (databaseType) {
+function getAutoIncrement(dbType: DatabaseType): string {
+  switch (dbType) {
     case DatabaseType.PostgreSQL:
-      return 'TIMESTAMP WITH TIME ZONE';
+      return ' GENERATED ALWAYS AS IDENTITY';
     case DatabaseType.MySQL:
-    case DatabaseType.MariaDB:
-      return 'DATETIME';
+      return ' AUTO_INCREMENT';
     case DatabaseType.SQLite:
-      return 'DATETIME';
-    default:
-      return 'TIMESTAMP';
+      return ' AUTOINCREMENT';
+    case DatabaseType.MSSQL:
+      return ' IDENTITY(1,1)';
   }
 }
 
-function mapType(type: string, format: string | undefined, databaseType: DatabaseType): string {
-  switch (type) {
-    case 'string':
-      if (format === 'date-time') {
-        return getTimestampType(databaseType);
-      }
-      if (format === 'date') {
-        return 'DATE';
-      }
-      if (format === 'time') {
-        return 'TIME';
-      }
-      if (format === 'email') {
-        return 'VARCHAR(255)';
-      }
-      if (format === 'uuid') {
-        return databaseType === DatabaseType.PostgreSQL ? 'UUID' : 'VARCHAR(36)';
-      }
-      return 'VARCHAR(255)';
-    
-    case 'number':
-      if (format === 'float' || format === 'double') {
-        return 'DOUBLE PRECISION';
-      }
-      return 'INTEGER';
-    
-    case 'integer':
-      return 'INTEGER';
-    
-    case 'boolean':
-      return databaseType === DatabaseType.PostgreSQL ? 'BOOLEAN' : 'TINYINT(1)';
-    
-    default:
-      return 'VARCHAR(255)';
+function getTimestampDefault(dbType: DatabaseType): string {
+  switch (dbType) {
+    case DatabaseType.PostgreSQL:
+      return ' DEFAULT CURRENT_TIMESTAMP';
+    case DatabaseType.MySQL:
+      return ' DEFAULT CURRENT_TIMESTAMP';
+    case DatabaseType.SQLite:
+      return ' DEFAULT CURRENT_TIMESTAMP';
+    case DatabaseType.MSSQL:
+      return ' DEFAULT GETDATE()';
   }
+}
+
+function generateTableName(name: string, strategy: string): string {
+  return name.toLowerCase();
+}
+
+function formatDefaultValue(value: any, type: string): string {
+  if (value === null) return 'NULL';
+  if (typeof value === 'string') return `'${value}'`;
+  if (typeof value === 'boolean') return value ? '1' : '0';
+  return String(value);
+}
+
+function generateConstraints(prop: SchemaProperty, dbType: DatabaseType): string {
+  const constraints: string[] = [];
+  
+  if (prop.constraints?.unique) {
+    constraints.push('UNIQUE');
+  }
+  
+  if (prop.constraints?.minLength && prop.type === 'string') {
+    constraints.push(`CHECK (LENGTH(${prop.name}) >= ${prop.constraints.minLength})`);
+  }
+  
+  if (prop.constraints?.maxLength && prop.type === 'string') {
+    constraints.push(`CHECK (LENGTH(${prop.name}) <= ${prop.constraints.maxLength})`);
+  }
+  
+  if (prop.constraints?.minimum !== undefined) {
+    constraints.push(`CHECK (${prop.name} >= ${prop.constraints.minimum})`);
+  }
+  
+  if (prop.constraints?.maximum !== undefined) {
+    constraints.push(`CHECK (${prop.name} <= ${prop.constraints.maximum})`);
+  }
+  
+  if (prop.constraints?.pattern) {
+    const regexOp = dbType === DatabaseType.PostgreSQL ? '~' : 'REGEXP';
+    constraints.push(`CHECK (${prop.name} ${regexOp} '${prop.constraints.pattern}')`);
+  }
+  
+  return constraints.join(' ');
 } 

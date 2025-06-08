@@ -13,10 +13,10 @@
 [![TypeORM](https://img.shields.io/badge/TypeORM-Support-E83524?style=flat-square&logo=typeorm&logoColor=white)](https://typeorm.io/)
 
 ### Database Support
-[![SQLite](https://img.shields.io/badge/SQLite-Support-003B57?style=flat-square&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
-[![MySQL](https://img.shields.io/badge/MySQL-Support-4479A1?style=flat-square&logo=mysql&logoColor=white)](https://www.mysql.com/)
-[![MariaDB](https://img.shields.io/badge/MariaDB-Support-003545?style=flat-square&logo=mariadb&logoColor=white)](https://mariadb.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Support-4169E1?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![MySQL](https://img.shields.io/badge/MySQL-Support-4479A1?style=flat-square&logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![SQLite](https://img.shields.io/badge/SQLite-Support-003B57?style=flat-square&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
+[![MSSQL](https://img.shields.io/badge/MSSQL-Support-CC2927?style=flat-square&logo=microsoftsqlserver&logoColor=white)](https://www.microsoft.com/sql-server)
 
 ### Project Status
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/eooo-io/specql/main.yml?style=flat-square)](https://github.com/eooo-io/specql/actions)
@@ -66,27 +66,41 @@ Automatically create migrations when your API specs change.
 **Documentation**  
 Keep your API, database, and code documentation in sync.
 
-A CLI tool that generates database setups from OpenAPI specifications.
+## Features
 
-## 🚀 Features
+- **Smart OpenAPI Processing**
+  - Reads OpenAPI specifications in JSON or YAML format
+  - Intelligent schema analysis and relationship detection
+  - Handles complex nested objects and arrays
 
-- 📝 Reads OpenAPI specifications in JSON or YAML format
-- 🗄️ Generates database schemas for multiple databases:
-  - SQLite: Perfect for development and small applications
-  - MySQL/MariaDB: Robust and widely-used
-  - PostgreSQL: Advanced features and JSON support
-- 🛠️ Supports multiple programming languages and frameworks:
-  - Python: FastAPI + SQLAlchemy
-  - PHP: Laravel + Eloquent
-  - TypeScript: TypeORM
-- 💻 Interactive CLI with smart configuration options
-- 🔄 Generates complete database setup including:
-  - Schema definitions
-  - Migrations
-  - ORM models
-  - Basic CRUD operations
+- **Multi-Database Support**
+  - PostgreSQL (recommended for production)
+  - MySQL (great for general use)
+  - SQLite (perfect for development)
+  - Microsoft SQL Server (enterprise ready)
 
-## 📦 Installation
+- **Beautiful Interactive CLI**
+  - Modern, colorful interface
+  - Step-by-step guided setup
+  - Smart defaults and recommendations
+  - Real-time validation and feedback
+  - Progress indicators and success messages
+
+- **Flexible Generation Options**
+  - Multiple naming strategies
+  - Schema generation strategies
+  - TypeScript type generation
+  - Sample query generation
+  - Customizable output structure
+
+- **Generated Assets**
+  - Database schema definitions
+  - TypeScript type definitions
+  - Sample CRUD queries
+  - Relationship mappings
+  - Index recommendations
+
+## Installation
 
 ```bash
 # Using npm
@@ -99,41 +113,54 @@ yarn global add specql
 pnpm add -g specql
 ```
 
-## 🎯 Quick Start
+## Quick Start
 
 ```bash
-# Generate database setup from OpenAPI spec
-specql --spec path/to/openapi.yaml
+# Initialize a new database setup
+specql init path/to/openapi.yaml
 
-# Preview changes without writing files
-specql --spec path/to/openapi.yaml --dry-run
-
-# Use configuration file
-specql --spec path/to/openapi.yaml --config path/to/config.yml
+# Get help and see all commands
+specql --help
 ```
 
-### ⚙️ Command Line Options
+### Interactive Setup
 
-| Option | Description |
-|--------|-------------|
-| `-s, --spec <path>` | Path to OpenAPI specification file (required) |
-| `-o, --output <path>` | Output directory for generated files |
-| `-c, --config <path>` | Path to configuration file |
-| `-f, --force` | Overwrite existing files |
-| `--dry-run` | Preview changes without writing files |
+specql guides you through the setup process with an interactive CLI:
 
-### 📄 Configuration File
+1. **Database Selection**
+   - Choose your target database
+   - Get recommendations based on your needs
+   - Configure database-specific options
 
-```yaml
-# config.yml
-language: python  # python, php, or typescript
-database: postgresql  # sqlite, mysql, mariadb, or postgresql
-output: ./output
-force: false
-dryRun: false
+2. **Naming Strategy**
+   - From schema titles (human-readable)
+   - From schema IDs (consistent)
+   - Custom naming pattern (advanced)
+
+3. **Schema Strategy**
+   - One table per schema (normalized)
+   - Denormalized (flatten nested objects)
+   - Custom mapping (advanced)
+
+4. **Additional Options**
+   - TypeScript type generation
+   - Sample query generation
+   - Output location customization
+
+## Generated Output
+
+```
+db/
+├── schema.sql        # Database schema definitions
+├── types/           # TypeScript type definitions
+│   └── index.ts
+└── queries/         # Sample SQL queries
+    ├── users.sql
+    ├── products.sql
+    └── orders.sql
 ```
 
-## 🛠️ Development
+## Development
 
 ### Prerequisites
 
@@ -162,24 +189,10 @@ npm link
 
 3. Run tests:
 ```bash
-# Run all tests
 npm test
-
-# Run with coverage
-npm run test:coverage
-
-# Run specific tests
-npm test -- --grep "feature name"
 ```
 
-### 🧪 Testing
-
-We use Jest for testing. Our test suite includes:
-- Unit tests
-- Integration tests
-- E2E tests for CLI operations
-
-### 📝 Code Style
+### Code Style
 
 We use ESLint and Prettier for code formatting:
 ```bash
@@ -190,40 +203,25 @@ npm run lint
 npm run lint:fix
 ```
 
-## 🤝 Contributing
+## Contributing
 
-We love your input! We want to make contributing to specql as easy and transparent as possible, whether it's:
+We love your input! We want to make contributing to specql as easy and transparent as possible. See our [Contributing Guide](CONTRIBUTING.md) for more information.
 
-- Reporting a bug
-- Discussing the current state of the code
-- Submitting a fix
-- Proposing new features
-- Becoming a maintainer
+## License
 
-### Development Process
+specql is [MIT licensed](LICENSE).
 
-1. Fork the repo and create your branch from `main`
-2. If you've added code that should be tested, add tests
-3. If you've changed APIs, update the documentation
-4. Ensure the test suite passes
-5. Make sure your code lints
-6. Issue that pull request!
-
-## 📜 License
-
-MIT License - see the [LICENSE](LICENSE) file for details
-
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - OpenAPI Initiative for the specification
 - All our contributors and supporters
 - The amazing open-source community
 
-## 📚 Documentation
+## Documentation
 
 For detailed documentation, please visit our [Wiki](https://github.com/eooo-io/specql/wiki).
 
-## 🔗 Links
+## Links
 
 - [npm package](https://www.npmjs.com/package/specql)
 - [GitHub repository](https://github.com/eooo-io/specql)

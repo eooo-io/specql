@@ -5,10 +5,22 @@ export enum Language {
 }
 
 export enum DatabaseType {
-  SQLite = 'sqlite',
+  PostgreSQL = 'postgresql',
   MySQL = 'mysql',
-  MariaDB = 'mariadb',
-  PostgreSQL = 'postgresql'
+  SQLite = 'sqlite',
+  MSSQL = 'mssql'
+}
+
+export enum NamingStrategy {
+  SchemaTitle = 'schema_title',
+  SchemaId = 'schema_id',
+  Custom = 'custom'
+}
+
+export enum SchemaStrategy {
+  OneTablePerSchema = 'one_table_per_schema',
+  Denormalized = 'denormalized',
+  Custom = 'custom'
 }
 
 export interface Config {
@@ -19,22 +31,40 @@ export interface Config {
   dryRun?: boolean;
 }
 
+export interface DatabaseConfig {
+  databaseType: DatabaseType;
+  namingStrategy: NamingStrategy;
+  schemaStrategy: SchemaStrategy;
+}
+
 export interface Schema {
   name: string;
   properties: SchemaProperty[];
-  required?: string[];
+  relations?: SchemaRelation[];
 }
 
 export interface SchemaProperty {
   name: string;
   type: string;
-  format?: string;
-  nullable?: boolean;
+  required: boolean;
+  defaultValue?: any;
+  constraints?: PropertyConstraints;
+}
+
+export interface SchemaRelation {
+  type: 'oneToOne' | 'oneToMany' | 'manyToOne' | 'manyToMany';
+  targetSchema: string;
+  foreignKey: string;
+  joinTable?: string;
+}
+
+export interface PropertyConstraints {
   unique?: boolean;
-  default?: any;
-  items?: SchemaProperty; // For array types
-  properties?: SchemaProperty[]; // For object types
-  ref?: string; // For $ref types
+  minLength?: number;
+  maxLength?: number;
+  minimum?: number;
+  maximum?: number;
+  pattern?: string;
 }
 
 export interface DatabaseSchema {
