@@ -30,4 +30,7 @@ logs/
 
 # Temporary files
 tmp/
-temp/ 
+temp/
+
+# Claude configuration
+.claude.config 
