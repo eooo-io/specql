@@ -16,64 +16,78 @@
 [![MariaDB](https://img.shields.io/badge/MariaDB-Support-003545?style=flat-square&logo=mariadb&logoColor=white)](https://mariadb.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Support-4169E1?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/eooo-io/specql/main.yml?style=flat-square)](https://github.com/eooo-io/specql/actions)
+[![Coverage](https://img.shields.io/codecov/c/github/eooo-io/specql?style=flat-square)](https://codecov.io/gh/eooo-io/specql)
+[![npm version](https://img.shields.io/npm/v/specql?style=flat-square)](https://www.npmjs.com/package/specql)
+[![npm downloads](https://img.shields.io/npm/dm/specql?style=flat-square)](https://www.npmjs.com/package/specql)
+
 [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg?style=flat-square)](https://conventionalcommits.org)
+[![Code Style](https://img.shields.io/badge/code%20style-prettier-F7B93E.svg?style=flat-square)](https://prettier.io)
 
 </div>
 
 A CLI tool that generates database setups from OpenAPI specifications.
 
-## Features
+## 🚀 Features
 
-- Reads OpenAPI specifications in JSON or YAML format
-- Generates database schemas for multiple databases:
-  - SQLite
-  - MySQL
-  - MariaDB
-  - PostgreSQL
-- Supports multiple programming languages and frameworks:
-  - Python (FastAPI + SQLAlchemy)
-  - PHP (Laravel + Eloquent)
-  - TypeScript (TypeORM)
-- Interactive CLI with configuration options
-- Generates complete database setup including:
+- 📝 Reads OpenAPI specifications in JSON or YAML format
+- 🗄️ Generates database schemas for multiple databases:
+  - SQLite: Perfect for development and small applications
+  - MySQL/MariaDB: Robust and widely-used
+  - PostgreSQL: Advanced features and JSON support
+- 🛠️ Supports multiple programming languages and frameworks:
+  - Python: FastAPI + SQLAlchemy
+  - PHP: Laravel + Eloquent
+  - TypeScript: TypeORM
+- 💻 Interactive CLI with smart configuration options
+- 🔄 Generates complete database setup including:
   - Schema definitions
   - Migrations
   - ORM models
   - Basic CRUD operations
 
-## Installation
+## 📦 Installation
 
 ```bash
+# Using npm
 npm install -g specql
+
+# Using yarn
+yarn global add specql
+
+# Using pnpm
+pnpm add -g specql
 ```
 
-## Usage
-
-Basic usage:
+## 🎯 Quick Start
 
 ```bash
+# Generate database setup from OpenAPI spec
 specql --spec path/to/openapi.yaml
+
+# Preview changes without writing files
+specql --spec path/to/openapi.yaml --dry-run
+
+# Use configuration file
+specql --spec path/to/openapi.yaml --config path/to/config.yml
 ```
 
-The CLI will prompt you for:
-1. Programming language selection
-2. Database type selection
-3. Additional configuration options
+### ⚙️ Command Line Options
 
-### Command Line Options
+| Option | Description |
+|--------|-------------|
+| `-s, --spec <path>` | Path to OpenAPI specification file (required) |
+| `-o, --output <path>` | Output directory for generated files |
+| `-c, --config <path>` | Path to configuration file |
+| `-f, --force` | Overwrite existing files |
+| `--dry-run` | Preview changes without writing files |
 
-- `-s, --spec <path>`: Path to OpenAPI specification file (required)
-- `-o, --output <path>`: Output directory for generated files
-- `-c, --config <path>`: Path to configuration file
-- `-f, --force`: Overwrite existing files
-- `--dry-run`: Preview changes without writing files
-
-### Configuration File
-
-You can provide a YAML configuration file with the following structure:
+### 📄 Configuration File
 
 ```yaml
+# config.yml
 language: python  # python, php, or typescript
 database: postgresql  # sqlite, mysql, mariadb, or postgresql
 output: ./output
@@ -81,45 +95,99 @@ force: false
 dryRun: false
 ```
 
-## Development
+## 🛠️ Development
 
 ### Prerequisites
 
 - Node.js 16+
-- npm or yarn
+- npm, yarn, or pnpm
 
 ### Setup
 
-1. Clone the repository:
+1. Clone and setup:
 ```bash
-git clone https://github.com/yourusername/specql.git
+# Clone the repository
+git clone https://github.com/eooo-io/specql.git
 cd specql
-```
 
-2. Install dependencies:
-```bash
+# Install dependencies
 npm install
-```
 
-3. Build the project:
-```bash
+# Build the project
 npm run build
 ```
 
-### Running Tests
-
+2. Create a link for local development:
 ```bash
-npm test
+npm link
 ```
 
-### Contributing
+3. Run tests:
+```bash
+# Run all tests
+npm test
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+# Run with coverage
+npm run test:coverage
 
-## License
+# Run specific tests
+npm test -- --grep "feature name"
+```
 
-MIT License - see the [LICENSE](LICENSE) file for details 
+### 🧪 Testing
+
+We use Jest for testing. Our test suite includes:
+- Unit tests
+- Integration tests
+- E2E tests for CLI operations
+
+### 📝 Code Style
+
+We use ESLint and Prettier for code formatting:
+```bash
+# Check code style
+npm run lint
+
+# Fix code style issues
+npm run lint:fix
+```
+
+## 🤝 Contributing
+
+We love your input! We want to make contributing to specql as easy and transparent as possible, whether it's:
+
+- Reporting a bug
+- Discussing the current state of the code
+- Submitting a fix
+- Proposing new features
+- Becoming a maintainer
+
+### Development Process
+
+1. Fork the repo and create your branch from `main`
+2. If you've added code that should be tested, add tests
+3. If you've changed APIs, update the documentation
+4. Ensure the test suite passes
+5. Make sure your code lints
+6. Issue that pull request!
+
+## 📜 License
+
+MIT License - see the [LICENSE](LICENSE) file for details
+
+## 🙏 Acknowledgments
+
+- OpenAPI Initiative for the specification
+- All our contributors and supporters
+- The amazing open-source community
+
+## 📚 Documentation
+
+For detailed documentation, please visit our [Wiki](https://github.com/eooo-io/specql/wiki).
+
+## 🔗 Links
+
+- [npm package](https://www.npmjs.com/package/specql)
+- [GitHub repository](https://github.com/eooo-io/specql)
+- [Issue tracker](https://github.com/eooo-io/specql/issues)
+- [Project roadmap](ROADMAP.md) 
