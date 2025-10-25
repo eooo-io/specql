@@ -36,4 +36,5 @@ tmp/
 temp/
 
 # Claude configuration
-.claude.config 
+.claude.config
+CLAUDE.md 

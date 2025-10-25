@@ -410,12 +410,6 @@ specql is [MIT licensed](LICENSE).
   - Management tools (pgAdmin, phpMyAdmin)
   - Troubleshooting and advanced configuration
 
-- **[CLAUDE.md](CLAUDE.md)** - Developer guide for AI assistants
-  - Project architecture and data flow
-  - Clean code and SOLID principles
-  - Google TypeScript Style Guide compliance
-  - Complete command reference
-
 - **[ROADMAP.md](ROADMAP.md)** - Future development plans
   - Planned features and enhancements
   - Phase-by-phase development strategy
