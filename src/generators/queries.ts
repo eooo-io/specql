@@ -1,14 +1,20 @@
-import { mkdirSync, writeFileSync } from 'fs';
-import { join } from 'path';
-import { Schema } from '../types';
+import {mkdirSync, writeFileSync} from 'fs';
+import {join} from 'path';
+import {Schema} from '../types';
 
-export async function generateQueries(schemas: Schema[], outputPath: string): Promise<void> {
+export async function generateQueries(
+  schemas: Schema[],
+  outputPath: string
+): Promise<void> {
   const queriesDir = join(outputPath, 'queries');
-  mkdirSync(queriesDir, { recursive: true });
+  mkdirSync(queriesDir, {recursive: true});
 
   for (const schema of schemas) {
     const content = generateQueriesForSchema(schema);
-    writeFileSync(join(queriesDir, `${schema.name.toLowerCase()}.sql`), content);
+    writeFileSync(
+      join(queriesDir, `${schema.name.toLowerCase()}.sql`),
+      content
+    );
   }
 }
 
@@ -30,9 +36,17 @@ SELECT id, ${schema.properties.map(p => p.name).join(', ')}
 FROM ${tableName};`);
 
   // Insert query
-  const insertColumns = ['created_at', 'updated_at', ...schema.properties.map(p => p.name)];
-  const insertValues = ['CURRENT_TIMESTAMP', 'CURRENT_TIMESTAMP', ...schema.properties.map(p => `:${p.name}`)];
-  
+  const insertColumns = [
+    'created_at',
+    'updated_at',
+    ...schema.properties.map(p => p.name),
+  ];
+  const insertValues = [
+    'CURRENT_TIMESTAMP',
+    'CURRENT_TIMESTAMP',
+    ...schema.properties.map(p => `:${p.name}`),
+  ];
+
   queries.push(`
 -- Insert new record
 INSERT INTO ${tableName} (${insertColumns.join(', ')})
@@ -74,7 +88,7 @@ WHERE ${searchConditions};`);
   if (schema.relations?.length) {
     schema.relations.forEach(relation => {
       const targetTable = relation.targetSchema.toLowerCase();
-      
+
       if (relation.type === 'manyToMany') {
         const joinTable = relation.joinTable || `${tableName}_${targetTable}`;
         queries.push(`
@@ -95,4 +109,4 @@ WHERE s.id = :id;`);
   }
 
   return queries.join('\n');
-} 
+}

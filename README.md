@@ -204,6 +204,7 @@ db/
 
 - Node.js 16+
 - npm, yarn, or pnpm
+- Docker and Docker Compose (for database testing)
 
 ### Setup
 
@@ -225,20 +226,158 @@ npm run build
 npm link
 ```
 
-3. Run tests:
+### Available Commands
+
+> For complete command reference with detailed descriptions, see [NPM_SCRIPTS.md](NPM_SCRIPTS.md)
+
+#### Build & Development
 ```bash
-npm test
+npm run build          # Compile TypeScript to JavaScript
+npm run dev            # Run in development mode with ts-node
+npm start              # Run the compiled CLI
+npm run clean          # Clean build artifacts
 ```
+
+#### Testing & Quality
+```bash
+npm test               # Run Jest tests
+npm run lint           # Check code with Google TypeScript Style
+npm run lint:fix       # Auto-fix linting issues
+npm run format         # Format code with Prettier
+npm run format:check   # Check formatting without changes
+npm run check          # Run linting and formatting checks
+```
+
+#### Documentation
+```bash
+npm run docs           # Generate TypeDoc documentation
+npm run docs:watch     # Watch mode - regenerate on file changes
+npm run docs:serve     # Generate and serve docs on localhost:8080
+```
+
+#### Database Development (Docker)
+```bash
+# Start databases
+npm run db:start              # Start all databases (PostgreSQL, MySQL, MSSQL, SQLite)
+npm run db:start:postgres     # Start PostgreSQL only
+npm run db:start:mysql        # Start MySQL only
+npm run db:start:mssql        # Start Microsoft SQL Server only
+npm run db:start:sqlite       # Start SQLite container only
+
+# Stop databases
+npm run db:stop               # Stop all databases
+npm run db:stop:postgres      # Stop PostgreSQL
+npm run db:stop:mysql         # Stop MySQL
+npm run db:stop:mssql         # Stop MSSQL
+
+# Database management
+npm run db:restart            # Restart all databases
+npm run db:logs               # View logs from all databases
+npm run db:ps                 # Show status of database containers
+npm run db:health             # Check health of all databases
+npm run db:clean              # Remove all containers and volumes (WARNING: deletes data!)
+npm run db:tools              # Start pgAdmin (port 5050) and phpMyAdmin (port 8080)
+```
+
+### Docker Development Environment
+
+specql includes a complete Docker setup for testing against real databases. All containers support both ARM64 (Apple Silicon) and AMD64 (Intel/AMD) architectures automatically.
+
+#### Quick Start with Docker
+
+```bash
+# Start all databases
+npm run db:start
+
+# Check they're running
+npm run db:ps
+npm run db:health
+
+# Generate a schema for PostgreSQL
+specql init openapi.yaml
+
+# Test your generated schema
+psql -h localhost -U specql -d specql_dev -f db/schema.sql
+
+# Or connect to the database directly
+./scripts/db.sh connect postgres
+```
+
+#### Available Databases
+
+| Database | Port | Username | Password | Database Name |
+|----------|------|----------|----------|---------------|
+| PostgreSQL 16 | 5432 | specql | specql_dev_password | specql_dev |
+| MySQL 8.0 | 3306 | specql | specql_dev_password | specql_dev |
+| MSSQL 2022 | 1433 | sa | SpecQL_Dev_Pass123! | specql_dev |
+| SQLite | - | - | - | /data/*.db |
+
+#### Connection Strings
+
+```bash
+# PostgreSQL
+postgresql://specql:specql_dev_password@localhost:5432/specql_dev
+
+# MySQL
+mysql://specql:specql_dev_password@localhost:3306/specql_dev
+
+# Microsoft SQL Server
+mssql://sa:SpecQL_Dev_Pass123!@localhost:1433/specql_dev
+```
+
+#### Management Tools
+
+Access database management web interfaces:
+
+```bash
+# Start the tools
+npm run db:tools
+
+# pgAdmin: http://localhost:5050
+# Email: admin@specql.local, Password: admin
+
+# phpMyAdmin: http://localhost:8080
+```
+
+#### Docker Helper Script
+
+The `scripts/db.sh` script provides additional functionality:
+
+```bash
+# Connect to database CLI
+./scripts/db.sh connect postgres
+./scripts/db.sh connect mysql
+./scripts/db.sh connect mssql
+
+# View logs for specific database
+./scripts/db.sh logs postgres
+./scripts/db.sh logs mysql
+
+# Restart specific database
+./scripts/db.sh restart postgres
+
+# Get help
+./scripts/db.sh help
+```
+
+For complete Docker documentation, see [DOCKER.md](DOCKER.md).
 
 ### Code Style
 
-We use ESLint and Prettier for code formatting:
+We follow the [Google TypeScript Style Guide](https://google.github.io/styleguide/tsguide.html):
+
 ```bash
 # Check code style
 npm run lint
 
-# Fix code style issues
+# Auto-fix style issues
 npm run lint:fix
+
+# Format with Prettier
+npm run format
+
+# Check all (lint + format)
+npm run check
 ```
 
 ## Contributing
@@ -257,7 +396,47 @@ specql is [MIT licensed](LICENSE).
 
 ## Documentation
 
-For detailed documentation, please visit our [Wiki](https://github.com/eooo-io/specql/wiki).
+### Project Documentation
+
+- **[NPM_SCRIPTS.md](NPM_SCRIPTS.md)** - Complete npm commands reference
+  - Detailed explanation of every npm script
+  - Usage examples and workflows
+  - Quick reference table
+  - Development, testing, and Docker commands
+
+- **[DOCKER.md](DOCKER.md)** - Complete Docker development environment guide
+  - Multi-database setup (PostgreSQL, MySQL, MSSQL, SQLite)
+  - Connection strings and credentials
+  - Management tools (pgAdmin, phpMyAdmin)
+  - Troubleshooting and advanced configuration
+
+- **[CLAUDE.md](CLAUDE.md)** - Developer guide for AI assistants
+  - Project architecture and data flow
+  - Clean code and SOLID principles
+  - Google TypeScript Style Guide compliance
+  - Complete command reference
+
+- **[ROADMAP.md](ROADMAP.md)** - Future development plans
+  - Planned features and enhancements
+  - Phase-by-phase development strategy
+  - ORM and API generation roadmap
+
+### API Documentation
+
+Generate API documentation from code:
+
+```bash
+npm run docs        # Generate TypeDoc documentation
+npm run docs:serve  # Generate and serve on localhost:8080
+```
+
+Documentation is generated with TypeDoc using the Material theme.
+
+### Additional Resources
+
+- [Wiki](https://github.com/eooo-io/specql/wiki) - Tutorials and guides
+- [Issue Tracker](https://github.com/eooo-io/specql/issues) - Bug reports and feature requests
+- [Discussions](https://github.com/eooo-io/specql/discussions) - Questions and community
 
 ## Links
 

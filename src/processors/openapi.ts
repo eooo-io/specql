@@ -1,30 +1,62 @@
-import { OpenAPIV3 } from 'openapi-types';
-import { PropertyConstraints, Schema, SchemaProperty } from '../types';
+/**
+ * OpenAPI specification processor module.
+ * Transforms OpenAPI v3 schemas into internal schema representation.
+ * @module processors/openapi
+ * @category Processors
+ */
 
-export async function processOpenApiSpec(spec: OpenAPIV3.Document): Promise<Schema[]> {
+import {OpenAPIV3} from 'openapi-types';
+import {PropertyConstraints, Schema, SchemaProperty} from '../types';
+
+/**
+ * Processes an OpenAPI v3 specification and extracts schemas.
+ * Parses all schemas defined in `components.schemas` and converts them
+ * to the internal Schema format, including property mappings and relationships.
+ *
+ * @param spec - The OpenAPI v3 document to process
+ * @returns Promise resolving to array of parsed schemas
+ *
+ * @example
+ * ```typescript
+ * const spec = await loadOpenApiSpec('openapi.yaml');
+ * const schemas = await processOpenApiSpec(spec);
+ * console.log(`Found ${schemas.length} schemas`);
+ * ```
+ */
+export async function processOpenApiSpec(
+  spec: OpenAPIV3.Document
+): Promise<Schema[]> {
   const schemas: Schema[] = [];
-  
+
   if (!spec.components?.schemas) {
     return schemas;
   }
 
-  for (const [schemaName, schemaObj] of Object.entries(spec.components.schemas)) {
-    if (!isSchemaObject(schemaObj)) continue;
+  for (const [schemaName, schemaObj] of Object.entries(
+    spec.components.schemas
+  )) {
+    if (!isSchemaObject(schemaObj)) {
+      continue;
+    }
 
     const schema: Schema = {
       name: schemaName,
       properties: [],
-      relations: []
+      relations: [],
     };
 
-    for (const [propName, propObj] of Object.entries(schemaObj.properties || {})) {
-      if (!isSchemaObject(propObj)) continue;
+    for (const [propName, propObj] of Object.entries(
+      schemaObj.properties || {}
+    )) {
+      if (!isSchemaObject(propObj)) {
+        continue;
+      }
 
       const property: SchemaProperty = {
         name: propName,
         type: mapOpenApiType(propObj),
         required: (schemaObj.required || []).includes(propName),
-        constraints: extractConstraints(propObj)
+        constraints: extractConstraints(propObj),
       };
 
       if (propObj.default !== undefined) {
@@ -33,12 +65,14 @@ export async function processOpenApiSpec(spec: OpenAPIV3.Document): Promise<Sche
 
       // Handle relationships
       if (propObj.$ref || (propObj.type === 'array' && propObj.items?.$ref)) {
-        const targetSchema = extractRefName(propObj.$ref || (propObj.items?.$ref as string));
+        const targetSchema = extractRefName(
+          propObj.$ref || (propObj.items?.$ref as string)
+        );
         if (targetSchema) {
           schema.relations?.push({
             type: propObj.type === 'array' ? 'oneToMany' : 'oneToOne',
             targetSchema,
-            foreignKey: `${targetSchema.toLowerCase()}_id`
+            foreignKey: `${targetSchema.toLowerCase()}_id`,
           });
           continue;
         }
@@ -88,18 +122,32 @@ function mapOpenApiType(prop: OpenAPIV3.SchemaObject): string {
 function extractConstraints(prop: OpenAPIV3.SchemaObject): PropertyConstraints {
   const constraints: PropertyConstraints = {};
 
-  if (prop.unique) constraints.unique = true;
-  if (prop.minLength) constraints.minLength = prop.minLength;
-  if (prop.maxLength) constraints.maxLength = prop.maxLength;
-  if (prop.minimum) constraints.minimum = prop.minimum;
-  if (prop.maximum) constraints.maximum = prop.maximum;
-  if (prop.pattern) constraints.pattern = prop.pattern;
+  if (prop.unique) {
+    constraints.unique = true;
+  }
+  if (prop.minLength) {
+    constraints.minLength = prop.minLength;
+  }
+  if (prop.maxLength) {
+    constraints.maxLength = prop.maxLength;
+  }
+  if (prop.minimum) {
+    constraints.minimum = prop.minimum;
+  }
+  if (prop.maximum) {
+    constraints.maximum = prop.maximum;
+  }
+  if (prop.pattern) {
+    constraints.pattern = prop.pattern;
+  }
 
   return Object.keys(constraints).length > 0 ? constraints : undefined;
 }
 
 function extractRefName(ref: string | undefined): string | undefined {
-  if (!ref) return undefined;
+  if (!ref) {
+    return undefined;
+  }
   const parts = ref.split('/');
   return parts[parts.length - 1];
-} 
+}

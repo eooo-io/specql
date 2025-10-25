@@ -1,6 +1,9 @@
-import { Config, DatabaseSchema, Language } from '../types';
+import {Config, DatabaseSchema, Language} from '../types';
 
-export async function generateCode(schema: DatabaseSchema, config: Config): Promise<void> {
+export async function generateCode(
+  schema: DatabaseSchema,
+  config: Config
+): Promise<void> {
   switch (config.language) {
     case Language.Python:
       await generatePythonCode(schema, config);
@@ -16,17 +19,26 @@ export async function generateCode(schema: DatabaseSchema, config: Config): Prom
   }
 }
 
-async function generatePythonCode(schema: DatabaseSchema, config: Config): Promise<void> {
+async function generatePythonCode(
+  schema: DatabaseSchema,
+  config: Config
+): Promise<void> {
   // TODO: Implement Python code generation
   console.log('Python code generation not yet implemented');
 }
 
-async function generatePhpCode(schema: DatabaseSchema, config: Config): Promise<void> {
+async function generatePhpCode(
+  schema: DatabaseSchema,
+  config: Config
+): Promise<void> {
   // TODO: Implement PHP code generation
   console.log('PHP code generation not yet implemented');
 }
 
-async function generateTypeScriptCode(schema: DatabaseSchema, config: Config): Promise<void> {
+async function generateTypeScriptCode(
+  schema: DatabaseSchema,
+  config: Config
+): Promise<void> {
   // TODO: Implement TypeScript code generation
   console.log('TypeScript code generation not yet implemented');
-} 
+}

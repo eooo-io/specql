@@ -1,0 +1,140 @@
+services:
+  # PostgreSQL - Recommended for production
+  postgres:
+    image: postgres:16-alpine
+    platform: linux/amd64
+    container_name: specql-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: specql_dev
+      POSTGRES_USER: specql
+      POSTGRES_PASSWORD: specql_dev_password
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --locale=en_US.UTF-8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/init-scripts/postgres:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U specql"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - specql-network
+
+  # MySQL - General purpose
+  mysql:
+    image: mysql:8.0
+    platform: linux/amd64
+    container_name: specql-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: specql_dev
+      MYSQL_USER: specql
+      MYSQL_PASSWORD: specql_dev_password
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/init-scripts/mysql:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "specql", "-pspecql_dev_password"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - specql-network
+    command: --default-authentication-plugin=mysql_native_password
+
+  # Microsoft SQL Server - Enterprise ready
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64
+    container_name: specql-mssql
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "SpecQL_Dev_Pass123!"
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+      - ./docker/init-scripts/mssql:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'SpecQL_Dev_Pass123!' -Q 'SELECT 1'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - specql-network
+
+  # SQLite is file-based, so we'll use a helper container for testing
+  sqlite:
+    image: alpine:3.19
+    platform: linux/amd64
+    container_name: specql-sqlite
+    restart: unless-stopped
+    command: tail -f /dev/null
+    volumes:
+      - sqlite_data:/data
+    networks:
+      - specql-network
+
+  # pgAdmin - PostgreSQL management tool
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    platform: linux/amd64
+    container_name: specql-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@specql.local
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - specql-network
+    depends_on:
+      - postgres
+    profiles:
+      - tools
+
+  # phpMyAdmin - MySQL management tool
+  phpmyadmin:
+    image: phpmyadmin:latest
+    platform: linux/amd64
+    container_name: specql-phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: specql
+      PMA_PASSWORD: specql_dev_password
+    ports:
+      - "8080:80"
+    networks:
+      - specql-network
+    depends_on:
+      - mysql
+    profiles:
+      - tools
+
+volumes:
+  postgres_data:
+    driver: local
+  mysql_data:
+    driver: local
+  mssql_data:
+    driver: local
+  sqlite_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+networks:
+  specql-network:
+    driver: bridge
